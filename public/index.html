@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO VUE GIN</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/quasar@1.15.10/dist/quasar.min.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <div id="todo">
+        <q-layout view="hHh LpR lFr">
+            <q-header elevated class="bg-primary text-white" height-hint="98">
+                <q-toolbar>
+                    <q-btn dense flat round icon="menu" @click="left = !left"></q-btn>
+            
+                    <q-toolbar-title>
+                        <q-avatar>
+                        <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+                        </q-avatar>
+                        Todo
+                    </q-toolbar-title>
+                </q-toolbar>
+        
+                <q-tabs align="left">
+                    <q-route-tab to="/page1" label="Page One"></q-route-tab>
+                    <q-route-tab to="/page2" label="Page Two"></q-route-tab>
+                    <q-route-tab to="/page3" label="Page Three"></q-route-tab>
+                </q-tabs>
+            </q-header>
+        
+            <q-drawer show-if-above v-model="leftDrawer" side="left" bordered>
+                <!-- drawer content -->
+            </q-drawer>
+        
+            <q-page-container>
+                <q-page>
+                    <q-list bordered>
+                        <q-item clickable v-ripple v-for="(task, index) in tasks" :key="index">
+                            <q-item-section avatar>
+                                <q-icon color="primary" name="bluetooth" />
+                            </q-item-section>
+                            <q-item-section>
+                                <q-item-label> {{ task.name }} </q-item-label>
+                                <q-item-label caption lines="2"> ID: {{ task.id }} {{ formatDate(task.updated_at) }} {{ formatDate(task.created_at) }} </q-item-label>
+                            </q-item-section>
+                        </q-item>
+                    </q-list>
+                </q-page>
+            </q-page-container>
+        
+            <q-footer elevated class="bg-grey-8 text-white">
+                <q-toolbar>
+                    <q-toolbar-title>
+                        <q-avatar>
+                        <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+                        </q-avatar>
+                        Title
+                    </q-toolbar-title>
+                </q-toolbar>
+            </q-footer>    
+        </q-layout>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@^2.0.0/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quasar@1.15.10/dist/quasar.umd.modern.min.js"></script>
+    <script src="https://unpkg.com/axios@0.20.0-0/dist/axios.min.js"></script>
+    
+    <script>
+        new Vue({
+            el: '#todo',
+            data: () => {
+                return {
+                    leftDrawer: false,
+                    tasks: []
+                }
+            },
+            mounted () {
+                this.listTodos()
+            },
+            methods: {
+                listTodos() {
+                    axios.get('/api/tasks')
+                        .then(response => {
+                            console.log(response)
+                            this.tasks = response.data
+                        }).catch(error => {
+                            console.log(err)
+                        })
+                },
+                formatDate(dateString) {
+                    let date = new Date(dateString)
+                    return Quasar.utils.date.formatDate(date,"YYYY-MM-DD")
+                }
+            },
+        })
+    </script>
+</body>
+</html>
