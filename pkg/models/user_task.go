@@ -1,11 +1,11 @@
 package models
 
-import "gorm.io/gorm"
+import "time"
 
 type UserTask struct {
-	gorm.Model
-	UserID uint
-	TaskID uint
-	User   User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
-	Task   Task `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	CreatedAt time.Time
+	UserID    uint `gorm:"primaryKey;autoIncrement:false"`
+	TaskID    uint `gorm:"primaryKey;autoIncrement:false"`
+	User      User `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	Task      Task `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 }
