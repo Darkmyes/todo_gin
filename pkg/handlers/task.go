@@ -141,13 +141,14 @@ func ListTasks(c *gin.Context) {
 		ID          uint      `json:"id"`
 		Name        string    `json:"name"`
 		Description string    `json:"description"`
+		State       bool      `json:"state"`
 		CreatedAt   time.Time `json:"created_at"`
 		UpdatedAt   time.Time `json:"updated_at"`
 	}
 
 	db := database.GetConnectionByDB()
 
-	results := db.Model(&models.Task{}).Select("id, name, description, created_at, updated_at").Find(&tasks)
+	results := db.Model(&models.Task{}).Select("id, name, description, state, created_at, updated_at").Find(&tasks)
 	//results := db.Find(&tasks)
 
 	if results.Error != nil {

@@ -1,7 +1,7 @@
 export default({
     template: 
         `<q-page>
-            <div class="q-pa-md column items-center justify-center bg-deep-purple-8 text-white">
+            <div class="q-pa-md column items-center justify-center bg-deep-purple-8 text-white" style="min-height: 60vh;">
                 <div class="text-h1 text-center text-bold q-mb-md">Simple ToDo</div>
                 <q-btn label="Join Now" to="/register" color="white" class="text-deep-purple-8"/>
             </div>

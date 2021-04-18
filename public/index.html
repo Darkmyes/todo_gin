@@ -22,7 +22,7 @@
                 </q-toolbar>
         
                 <q-tabs align="left">
-                    <q-route-tab to="/" label="Tareas"></q-route-tab>
+                    <q-route-tab to="/home" label="Tareas"></q-route-tab>
                     <q-route-tab to="/prueba" label="Prueba"></q-route-tab>
                 </q-tabs>
             </q-header>
@@ -42,6 +42,7 @@
     <script src="js/libs/quasar.js"></script>
     <script src="js/libs/axios.js"></script>
     <script src="js/libs/vue-router.js"></script>
+    <script src="js/libs/vuex.js"></script>
     
     <!-- MAIN APP -->
     <script type="module">
@@ -49,10 +50,15 @@
         import homePage from './js/pages/home.js'
         import registerPage from './js/pages/register.js'
         import loginPage from './js/pages/login.js'
+        import tasksPage from './js/components/tasks.js'
 
         /* COMPONENTS */
         //import taskComponent from './js/components/tasks.js'
         import pruebaComponent from './js/components/prueba.js'
+
+        /* STORE */
+        import authModule from './js/store/auth.js'
+        import tasksModule from './js/store/tasks.js'
 
         const router = new VueRouter({
             mode: 'history',
@@ -61,12 +67,23 @@
                 { path: '/register', component: registerPage },
                 { path: '/login', component: loginPage },
                 { path: '/prueba', component: pruebaComponent },
+                { path: '/home', component: tasksPage}
             ]
         })
 
-        new Vue({
+        const store = new Vuex.Store({
+            modules: {
+                auth: authModule,
+                tasks: tasksModule
+            }
+        })
+
+        Vue.prototype.$http = axios
+
+        var todoApp = new Vue({
             el: '#todo',
             router,
+            store,
             data: () => {
                 return {
                     leftDrawer: false
