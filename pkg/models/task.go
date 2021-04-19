@@ -7,9 +7,6 @@ type Task struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	State       bool   `json:"state"`
-}
-
-type TaskUsers struct {
-	Task      Task   `json:"task"`
-	TaskUsers []User `json:"users"`
+	UserID      uint   `json:"user_id" gorm:"primaryKey;autoIncrement:false"`
+	User        User   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 }

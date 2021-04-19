@@ -10,6 +10,6 @@ func Migrate() {
 	db.AutoMigrate(
 		&models.User{},
 		&models.Task{},
-		&models.UserTask{},
+		//&models.UserTask{},
 	)
 }

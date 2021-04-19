@@ -9,7 +9,7 @@ import (
 func SetUserRoutes(router *gin.RouterGroup) {
 	userRoutes := router.Group("/users")
 	{
-		userRoutes.GET("", handlers.ListUsers)
+		userRoutes.GET("/data", handlers.UserByToken)
 		//userRoutes.POST("", handlers.RegisterUser)
 		//userRoutes.POST("/login", handlers.Login)
 

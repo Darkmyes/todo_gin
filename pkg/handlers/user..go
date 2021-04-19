@@ -1,15 +1,14 @@
 package handlers
 
 import (
-	"errors"
-	"fmt"
 	"net/http"
+	"todo_gin/configs"
 	"todo_gin/pkg/database"
 	"todo_gin/pkg/models"
 	"todo_gin/pkg/utils"
 
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 func RegisterUser(c *gin.Context) {
@@ -37,35 +36,23 @@ func RegisterUser(c *gin.Context) {
 	})
 }
 
-func Login(c *gin.Context) {
-	var user, requestUser models.User
+func UserByToken(c *gin.Context) {
+	var user models.User
 
-	if err := c.ShouldBindJSON(&requestUser); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+	claims := jwt.ExtractClaims(c)
+	userID := uint(claims[configs.IdentityKey].(float64))
 
 	db := database.GetConnectionByDB()
+	results := db.Model(&models.User{}).Select("id, name, email").Find(&user, userID)
 
-	result := db.First(&user, "email = ?", requestUser.Email)
-
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "User not Found"})
+	if results.Error != nil {
+		c.JSON(200, gin.H{
+			"message": "Error",
+		})
 		return
 	}
 
-	if utils.DoPasswordsMatch(user.Password, requestUser.Password) {
-		fmt.Println(user.Password)
-		fmt.Println(requestUser.Password)
-
-		c.JSON(200, gin.H{
-			"message": "Sucessfull Login",
-		})
-	} else {
-		c.JSON(401, gin.H{
-			"message": "Error in Login",
-		})
-	}
+	c.JSON(200, &user)
 }
 
 func ListUsers(c *gin.Context) {
@@ -76,7 +63,6 @@ func ListUsers(c *gin.Context) {
 	}
 
 	db := database.GetConnectionByDB()
-
 	results := db.Model(&models.User{}).Select("id, name, email").Find(&users)
 
 	if results.Error != nil {

@@ -3,22 +3,26 @@ package handlers
 import (
 	"errors"
 	"net/http"
-	"strconv"
 	"time"
+	"todo_gin/configs"
 	"todo_gin/pkg/database"
 	"todo_gin/pkg/models"
 
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 func RegisterTask(c *gin.Context) {
-	var task models.TaskUsers
+	var task models.Task
 
 	if err := c.ShouldBindJSON(&task); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	claims := jwt.ExtractClaims(c)
+	task.UserID = uint(claims[configs.IdentityKey].(float64))
 
 	db := database.GetConnectionByDB()
 	db.Create(&task)
@@ -55,57 +59,8 @@ func UpdateTask(c *gin.Context) {
 			originalTask.Description = value.(string)
 		case "state":
 			originalTask.State = value.(bool)
-		case "users":
-			var originalUsers []models.UserTask
-			result := db.Find(&originalUsers, "task_id = ?", taskID)
-			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "Error while trying updating task"})
-				return
-			}
-
-			userTasksMustDelete := []uint{}
-
-			for _, originalUser := range originalUsers {
-				exists := false
-
-				for _, user := range value.([]uint) {
-					if user == originalUser.UserID {
-						exists = true
-					}
-				}
-
-				if !exists {
-					userTasksMustDelete = append(userTasksMustDelete, originalUser.Task.ID)
-				}
-			}
-
-			result = db.Delete(&models.UserTask{}, userTasksMustDelete)
-
-			if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "Error while trying updating task"})
-				return
-			}
-
-			for _, user := range value.([]uint) {
-				exists := false
-
-				for _, originalUser := range originalUsers {
-					if user == originalUser.UserID {
-						exists = true
-					}
-				}
-
-				if !exists {
-					taskIDUint, err := strconv.Atoi(taskID)
-					if err != nil {
-						c.JSON(http.StatusBadRequest, gin.H{"error": "Error while trying updating task"})
-						return
-					}
-					newUserTask := models.UserTask{UserID: user, TaskID: uint(taskIDUint)}
-					db.Create(&newUserTask)
-				}
-			}
-
+		case "user":
+			originalTask.UserID = value.(uint)
 		}
 	}
 
@@ -146,9 +101,15 @@ func ListTasks(c *gin.Context) {
 		UpdatedAt   time.Time `json:"updated_at"`
 	}
 
+	claims := jwt.ExtractClaims(c)
+	userID := uint(claims[configs.IdentityKey].(float64))
+
 	db := database.GetConnectionByDB()
 
-	results := db.Model(&models.Task{}).Select("id, name, description, state, created_at, updated_at").Find(&tasks)
+	results := db.Model(&models.Task{}).
+		Select("id, name, description, state, created_at, updated_at").
+		Where("user_id = ?", userID).
+		Find(&tasks)
 	//results := db.Find(&tasks)
 
 	if results.Error != nil {

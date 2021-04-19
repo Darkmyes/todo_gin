@@ -2,8 +2,10 @@ package routes
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"time"
+	"todo_gin/configs"
 	"todo_gin/pkg/database"
 	"todo_gin/pkg/models"
 	"todo_gin/pkg/utils"
@@ -13,7 +15,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const identityKey = "id"
+const identityKey = configs.IdentityKey
 
 func GetAuthMiddleware() *jwt.GinJWTMiddleware {
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
@@ -46,6 +48,7 @@ func GetAuthMiddleware() *jwt.GinJWTMiddleware {
 }
 
 func payloadFunc(data interface{}) jwt.MapClaims {
+	fmt.Println("aqui")
 	if v, ok := data.(*models.User); ok {
 		return jwt.MapClaims{
 			identityKey: v.ID,

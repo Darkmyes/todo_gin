@@ -50,7 +50,7 @@
         import homePage from './js/pages/home.js'
         import registerPage from './js/pages/register.js'
         import loginPage from './js/pages/login.js'
-        import tasksPage from './js/components/tasks.js'
+        import tasksPage from './js/pages/tasks.js'
 
         /* COMPONENTS */
         //import taskComponent from './js/components/tasks.js'
@@ -60,6 +60,13 @@
         import authModule from './js/store/auth.js'
         import tasksModule from './js/store/tasks.js'
 
+        const store = new Vuex.Store({
+            modules: {
+                auth: authModule,
+                tasks: tasksModule
+            }
+        })
+
         const router = new VueRouter({
             mode: 'history',
             routes: [
@@ -67,14 +74,26 @@
                 { path: '/register', component: registerPage },
                 { path: '/login', component: loginPage },
                 { path: '/prueba', component: pruebaComponent },
-                { path: '/home', component: tasksPage}
+                { path: '/home', component: tasksPage, meta: { requiresAuth: true } }
             ]
         })
 
-        const store = new Vuex.Store({
-            modules: {
-                auth: authModule,
-                tasks: tasksModule
+        router.beforeEach(async (to, from, next) => {
+            console.log("beforeEach")
+            if (store.getters['auth/isLoggedIn']) {
+                console.log("loggedIn")
+                if (!store.getters['auth/getUser']) {
+                    await store._actions['auth/getUserData'][0]( axios ) // Solicitud user data
+                }
+            }
+            if (store.getters['auth/isLoggedIn']) {
+                next()
+            } else {
+                if (to.matched.some(record => record.meta.requiresAuth)) {
+                    next('/');
+                } else {
+                    next()
+                }
             }
         })
 

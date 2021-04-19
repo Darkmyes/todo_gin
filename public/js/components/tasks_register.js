@@ -15,12 +15,14 @@ export default({
         tasks: []
     }),
     mounted () {
+        console.log("tasks mounted")
         this.listTasks()
     },
     methods: {
         listTasks () {
             this.$store.dispatch('tasks/list', this.$http )
                 .then(res => {
+                    console.log(res)
                     this.tasks = res
                 }) 
                 .catch(err => {

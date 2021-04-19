@@ -9,12 +9,12 @@ export default({
                 </div>
             </div>
             <div class="q-pa-md" style="display: grid; grid-template-columns: auto; gap: .5rem;"> 
-                <q-input type="email" id="email" label="Email" v-model="loginForm.email" outlined dark color="white">
+                <q-input type="email" id="email" name="email" label="Email" v-model="loginForm.email" outlined dark color="white">
                     <template v-slot:prepend>
                         <q-icon name="mail" />
                     </template>
                 </q-input>
-                <q-input type="password" id="password" label="Password" v-model="loginForm.password" outlined dark color="white">
+                <q-input type="password" id="password" name="password" label="Password" v-model="loginForm.password" outlined dark color="white">
                     <template v-slot:prepend>
                         <q-icon name="lock" />
                     </template>
