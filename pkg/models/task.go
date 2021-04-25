@@ -7,6 +7,6 @@ type Task struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	State       bool   `json:"state"`
-	UserID      uint   `json:"user_id" gorm:"primaryKey;autoIncrement:false"`
+	UserID      uint   `json:"user_id" gorm:"autoIncrement:false"`
 	User        User   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 }

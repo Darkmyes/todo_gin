@@ -14,28 +14,34 @@
         <q-layout view="hHh LpR lFr">
             <q-header v-if="$route.path != '/' && $route.path != '/register' && $route.path != '/login'" elevated class="bg-primary text-white" height-hint="98">
                 <q-toolbar>
-                    <q-btn dense flat round icon="menu" @click="leftDrawer = !leftDrawer"></q-btn>
-            
                     <q-toolbar-title>
-                        Todo
+                        Todo With Vue & Gin
                     </q-toolbar-title>
+                    <q-space></q-space>
+                    <q-btn @click="setDarkMode(false)" flat rounded dense v-if="isDark" color="white" icon="light_mode"></q-btn>
+                    <q-btn @click="setDarkMode(true)" flat rounded dense v-if="!isDark" color="white" icon="dark_mode"></q-btn>
                 </q-toolbar>
         
                 <q-tabs align="left">
-                    <q-route-tab to="/home" label="Tareas"></q-route-tab>
-                    <q-route-tab to="/prueba" label="Prueba"></q-route-tab>
+                    <q-route-tab to="/home" label="Tasks"></q-route-tab>
+                    <q-route-tab to="/user" label="User"></q-route-tab>
                 </q-tabs>
             </q-header>
-        
-            <q-drawer v-if="$route.path != '/' && $route.path != '/register' && $route.path != '/login'" show-if-above v-model="leftDrawer" side="left" bordered>
-                <!-- drawer content -->
-            </q-drawer>
-        
+                
             <q-page-container>
                 <router-view></router-view>                
             </q-page-container>   
         </q-layout>
     </div>
+    
+    <script>
+        window.quasarConfig = {
+            brand: { // this will NOT work on IE 11
+                primary: '#ab47bc',
+                // ... or all other brand colors
+            }
+        }
+    </script>
 
     <!-- LIBRARYS -->
     <script src="js/libs/vuejs.js"></script>
@@ -43,7 +49,7 @@
     <script src="js/libs/axios.js"></script>
     <script src="js/libs/vue-router.js"></script>
     <script src="js/libs/vuex.js"></script>
-    
+
     <!-- MAIN APP -->
     <script type="module">
         /* PAGES */
@@ -51,7 +57,7 @@
         import registerPage from './js/pages/register.js'
         import loginPage from './js/pages/login.js'
         import tasksPage from './js/pages/tasks.js'
-
+        import userPage from './js/pages/user_data.js'
         /* COMPONENTS */
         //import taskComponent from './js/components/tasks.js'
         import pruebaComponent from './js/components/prueba.js'
@@ -73,7 +79,7 @@
                 { path: '/', component: homePage },
                 { path: '/register', component: registerPage },
                 { path: '/login', component: loginPage },
-                { path: '/prueba', component: pruebaComponent },
+                { path: '/user', component: userPage },
                 { path: '/home', component: tasksPage, meta: { requiresAuth: true } }
             ]
         })
@@ -83,14 +89,21 @@
             if (store.getters['auth/isLoggedIn']) {
                 console.log("loggedIn")
                 if (!store.getters['auth/getUser']) {
-                    await store._actions['auth/getUserData'][0]( axios ) // Solicitud user data
+                    try {
+                        let userData = await store._actions['auth/getUserData'][0]( axios ) // Solicitud user data
+                    } catch (error) {
+                        console.error(error)
+                    }
                 }
             }
             if (store.getters['auth/isLoggedIn']) {
+                if (to.path == "/") {
+                    next('/home')
+                }
                 next()
             } else {
                 if (to.matched.some(record => record.meta.requiresAuth)) {
-                    next('/');
+                    next('/')
                 } else {
                     next()
                 }
@@ -105,7 +118,20 @@
             store,
             data: () => {
                 return {
-                    leftDrawer: false
+                    leftDrawer: false,
+                    isDark: false,
+                }
+            }, mounted () {
+                if (localStorage.getItem("darkMode") == "true") {
+                    this.isDark = true
+                    this.$q.dark.set(true)
+                }
+            },
+            methods: {
+                setDarkMode (value) {
+                    localStorage.setItem("darkMode", value.toString())
+                    this.isDark = value
+                    this.$q.dark.set(value)
                 }
             }
         })

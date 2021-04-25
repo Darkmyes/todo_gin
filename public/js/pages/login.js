@@ -1,6 +1,6 @@
 export default({
     template: 
-        `<q-page class="q-pa-md column items-center justify-center bg-deep-purple-8 text-white">
+        `<q-page class="q-pa-md column items-center justify-center bg-primary text-white">
             <div class="text-center">
                 <div class="text-h3 q-mb-md">Login</div>
                 <div>
@@ -21,15 +21,15 @@ export default({
                 </q-input>
             </div>
 
-            <q-btn label="Login" @click="loginBtn" color="white" class="text-deep-purple-8"/>
+            <q-btn label="Login" @click="loginBtn" color="white" class="text-primary"/>
 
             <q-dialog v-model="errorModal">
                 <q-card>
-                    <q-card-section class="text-deep-purple-8 text-h6">
+                    <q-card-section class="text-primary text-h6">
                         Eror, Credentials not Match
                     </q-card-section>
                     <q-card-actions align="right">
-                        <q-btn label="OK" v-close-popup color="deep-purple-8"/>
+                        <q-btn label="OK" v-close-popup color="primary"/>
                     </q-card-actions>
                 </q-card>
             </q-dialog>

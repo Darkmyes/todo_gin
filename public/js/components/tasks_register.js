@@ -1,37 +1,36 @@
 export default({
     template: 
-        `<q-list bordered>
-            <q-item clickable v-ripple v-for="(task, index) in tasks" :key="index">
-                <q-item-section avatar>
-                    <q-checkbox v-model="task.state"/>
-                </q-item-section>
-                <q-item-section>
-                    <q-item-label> {{ task.name }} </q-item-label>
-                    <q-item-label caption lines="2"> ID: {{ task.id }} {{ formatDate(task.updated_at) }} {{ formatDate(task.created_at) }} </q-item-label>
-                </q-item-section>
-            </q-item>
-        </q-list>`,
+        `<q-card>
+            <q-card-section class="bg-primary text-white row items-center justify-center">
+                <div class="text-center text-h6 text-bold"> New Task </div>
+            </q-card-section>
+            <q-card-section class="column">
+                <q-input outlined type="text" v-model="task.name" label="Name" class="q-mb-sm"/>
+                <q-input outlined type="textarea" v-model="task.description" label="Description"/>
+            </q-card-section>
+            <q-card-actions align="center">
+                <q-btn @click="registerTask" label="Register" color="positive"/>
+            </q-card-actions>
+        </q-card>`,
     data: () => ({
-        tasks: []
+        task: {
+            name: "",
+            description: ""
+        }
     }),
     mounted () {
-        console.log("tasks mounted")
-        this.listTasks()
+        console.log("tasks register mounted")
     },
     methods: {
-        listTasks () {
-            this.$store.dispatch('tasks/list', this.$http )
+        registerTask () {
+            this.$store.dispatch('tasks/register', { axios: this.$http, task: this.task} )
                 .then(res => {
                     console.log(res)
-                    this.tasks = res
+                    this.$emit('register-done')
                 }) 
                 .catch(err => {
                     console.error(err)
                 })
-        },
-        formatDate(dateString) {
-            let date = new Date(dateString)
-            return Quasar.utils.date.formatDate(date,"YYYY-MM-DD")
         }
     }
 });

@@ -116,6 +116,7 @@ func ListTasks(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "Error",
 		})
+		return
 	}
 
 	c.JSON(200, &tasks)

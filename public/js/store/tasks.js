@@ -2,39 +2,55 @@ export default ({
     namespaced: true,
 
     state: () => ({
+        tasks: []
     }),
     getters: {
 
     },
     mutations: {
+        setTasks (state, tasks) {
+            state.tasks = tasks
+        },
     },
     actions: {
-        list ({commit}, axios) {
+        list ({commit}, axios) {   
+            console.log("aqui")         
+            axios.get('/api/tasks')
+                .then(res => {
+                    commit("setTasks", res.data)
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+        },
+        register ({ dispatch }, {axios, task}) {
             return new Promise((resolve, reject) => {
-                axios.get('/api/tasks')
+                axios.post('/api/tasks',{
+                    'name': task.name,
+                    'description': task.description
+                })
                     .then(res => {
-                        let tasks = res.data
-                        resolve(tasks)
+                        dispatch("list", axios)
+                        resolve(res.data)
                     })
                     .catch(err => {
                         reject(err)
                     })
             })
         },
-        register ({commit}, {axios}) {
-            /*return new Promise((resolve, reject) => {
-                axios.post('/auth/login',{
-                    email: loginData.email,
-                    password: loginData.password
+        setState ({ dispatch }, {axios, taskID, state}) {
+            return new Promise((resolve, reject) => {
+                axios.put('/api/tasks/' + taskID ,{
+                    'state': state
                 })
                     .then(res => {
-                        commit('setToken', res.data.token)
+                        dispatch("list", axios)
                         resolve(res.data)
                     })
                     .catch(err => {
                         reject(err)
                     })
-            })*/
+            })
         }
     }
 })

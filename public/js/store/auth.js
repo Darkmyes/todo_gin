@@ -70,12 +70,14 @@ export default ({
                     }
                 })
                     .then(res => {
-                        console.log(res)
                         axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
                         commit('setUser', res.data)
                         resolve(res.data)
                     })
                     .catch(err => {
+                        delete axios.defaults.headers.common['Authorization']
+                        commit('setToken', null)
+                        commit('setUser', null)
                         console.error(err)
                         reject(err)
                     })
